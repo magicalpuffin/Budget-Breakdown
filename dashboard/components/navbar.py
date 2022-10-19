@@ -1,5 +1,6 @@
 import dash_bootstrap_components as dbc
 
+# Uses dash boot strap components for navbar. Navbar references match dash multipage links
 navbar= dbc.NavbarSimple(
     children= [
         dbc.NavItem(dbc.NavLink("Home", href='/')),
