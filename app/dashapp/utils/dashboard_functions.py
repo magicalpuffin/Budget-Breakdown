@@ -1,10 +1,16 @@
 import pandas as pd
+import re
 
+# Consider making the utils folder a module
 def id_factory(parent_id: str):
     '''
     Function factory. Creates a function to append child-id to parent-id. Used for pages
     in dash due to unique id requirements.
     '''
+
+    if re.search(r".py", parent_id):
+        parent_id = re.match(r".*(?=\.py)", parent_id).group(0)
+    
     def func(child_id: str):
         return f"{parent_id}-{child_id}"
     return func

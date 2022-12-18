@@ -1,7 +1,6 @@
-import dash
-from dash import html, dcc
+from dash import register_page, html, dcc
 
-dash.register_page(
+register_page(
     __name__,
     path='/',
     redirect_from=['/home'],
