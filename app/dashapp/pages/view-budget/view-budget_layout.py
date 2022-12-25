@@ -1,10 +1,6 @@
 from dash import html, dcc, dash_table
-from dash import register_page, callback, Input, Output
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-import json
-import os
+from dash import register_page
+import dash_bootstrap_components as dbc
 
 from utils.dashboard_functions import *
 
@@ -25,6 +21,30 @@ page_id = id_factory('view-budget')
 layout = html.Div(
     [
         html.H1('Budget Breakdown Figure', id= page_id('header-main')),
+        dbc.Row([
+            dbc.Label("Time Range", width= 1),
+            dbc.Col(
+                dcc.DatePickerRange(
+                    id= page_id('input-date-range'), 
+                ),
+                width= 2
+            ),
+            dbc.Label("Time Bin", width= 1),
+            dbc.Col(
+                dcc.Dropdown(
+                    value= 'Month', 
+                    options= [
+                        'Week', 
+                        'Month', 
+                        'Quarter', 
+                        'Year'
+                    ],
+                    clearable= False,
+                    id= page_id('input-time-dropdown')
+                ),
+                width= 2
+            )
+        ]),
         dcc.Graph(id= page_id('figure-budget')),
         dash_table.DataTable(
             id = page_id('table-budget'),

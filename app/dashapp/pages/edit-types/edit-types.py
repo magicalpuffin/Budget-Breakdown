@@ -18,6 +18,8 @@ layout = html.Div(
         html.H5("Types", id = page_id('header-main')),
         dbc.Row([
             dbc.Col([
+                # For some reason, in order to copy paste into the table,
+                # you must make the entire table editable and then set columns to false
                 dash_table.DataTable(
                     id= page_id('table-types'), 
                     columns= [
@@ -29,7 +31,6 @@ layout = html.Div(
                     filter_action= 'native',
                     sort_action= 'native',
                     editable= True,
-                    # cell_selectable= True,
                     ),
             ], width= 6),
             dbc.Col([

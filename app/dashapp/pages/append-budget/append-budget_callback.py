@@ -6,7 +6,7 @@ import pandas as pd
 import base64
 import io
 
-from app import debugsession
+from app import db
 from app.models import Ledger, TypeTable
 from utils.dashboard_functions import *
 
@@ -50,7 +50,7 @@ def displayadded(upload_dict):
     if upload_dict:
         upload_df = pd.DataFrame.from_records(upload_dict)
         # Should use the sqlachemy way
-        ledger_df = pd.read_sql("SELECT * FROM ledger", debugsession.connection())
+        ledger_df = pd.read_sql("SELECT * FROM ledger", db.session.connection())
 
         added_df = upload_df[~upload_df['Id'].isin(ledger_df['id'])]
 
@@ -73,16 +73,24 @@ def appenddata(n_clicks, added_dict):
     if n_clicks:
         added_df = pd.DataFrame.from_records(added_dict)
 
-        type_list = debugsession.execute(select(TypeTable)).all()
+        type_list = db.session.execute(select(TypeTable)).all()
         type_df = pd.DataFrame.from_records([item[0].as_dict() for item in type_list])
 
         new_type_list = []
-        for name in added_df[~added_df['Name'].isin(type_df['name'])]['Name'].unique():
-            new_type_list.append(
-                TypeTable(
-                    name = name
+        if len(type_df.index) !=0 :
+            for name in added_df[~added_df['Name'].isin(type_df['name'])]['Name'].unique():
+                new_type_list.append(
+                    TypeTable(
+                        name = name
+                    )
                 )
-            )
+        else:
+            for name in added_df['Name'].unique():
+                new_type_list.append(
+                    TypeTable(
+                        name = name
+                    )
+                )
 
         # This could be a function
         ledger_list = []
@@ -97,9 +105,9 @@ def appenddata(n_clicks, added_dict):
                 )
             )
         
-        debugsession.bulk_save_objects(ledger_list)
-        debugsession.bulk_save_objects(new_type_list)
-        debugsession.commit()
+        db.session.bulk_save_objects(ledger_list)
+        db.session.bulk_save_objects(new_type_list)
+        db.session.commit()
 
         # The returned message should be more useful
         return "Appended"

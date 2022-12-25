@@ -6,11 +6,12 @@ import plotly.graph_objects as go
 import json
 import os
 
-from app import debugsession
 from app.models import Ledger, TypeTable
 from sqlalchemy import select
 
 from utils.dashboard_functions import *
+
+from app import db
 
 page_id = id_factory('view-budget')
 
@@ -32,7 +33,7 @@ def updatestore(header_text):
         TypeTable, 
         Ledger.name == TypeTable.name)
 
-    cledger_dict = debugsession.execute(qstmnt).all()
+    cledger_dict = db.session.execute(qstmnt).all()
     cldeger_df = pd.DataFrame.from_records(cledger_dict)
     cldeger_df.columns =['id', 'date', 'name', 'amount', 'source', 'type']
 

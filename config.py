@@ -9,6 +9,6 @@ class Config(object):
     # Add more info here
     # There should not be any commas
     SECRET_KEY = os.environ.get('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI_DEBUG1')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False,
     # SQLALCHEMY_ECHO = True

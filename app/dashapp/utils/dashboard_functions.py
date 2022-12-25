@@ -8,6 +8,7 @@ def id_factory(parent_id: str):
     in dash due to unique id requirements.
     '''
 
+    # Enables using  __name__. Removes file extension to be used as name
     if re.search(r".py", parent_id):
         parent_id = re.match(r".*(?=\.py)", parent_id).group(0)
     
@@ -21,6 +22,7 @@ def clean_import(import_df):
     Cleans the imported data into a standard format. [Date, ID, Name, Amount, Source].
     '''
 
+    # Not even sure if there is a point, might be better to have source as a entered in field
     # Data from fidelity uses date while bank of america uses posted date
     # This is used to identify which type of filtering to use
     if import_df.columns[0] == 'Date':
@@ -33,13 +35,18 @@ def clean_FDT(FDT_data):
     '''
     Converts fidelity data into standard format
     '''
-
+    
+    # The structure of fidelity's data changed, should make it better format stuff
     # Using memo as id. Debit transactions are spending money. Payments are excluded
     # Not sure why I used drop instead of just slicing
     # Depending on how this function is used, convertind datetime now might be useless
     FDT_data = FDT_data.rename(columns={"Memo" : "Id"})
     FDT_data = FDT_data[FDT_data["Transaction"] == "DEBIT"]
     FDT_data = FDT_data.drop("Transaction", axis=1)
+    
+    # Removes excess semicolons in Id. Removes excess spaces
+    FDT_data['Id'] = FDT_data['Id'].apply(lambda x: re.split(r";", x)[0])
+    FDT_data['Name'] = FDT_data['Name'].apply(lambda x: re.sub(r"\s+", " ", x))
     FDT_data["Date"] = pd.to_datetime(FDT_data["Date"])
     FDT_data["Source"] = "Fidelity"
 
@@ -55,6 +62,7 @@ def clean_BAC(BAC_data):
     # Will need to determine how to address cashback. Could filter and just make this expenses only
     BAC_data = BAC_data.rename(columns={"Posted Date": "Date", "Reference Number": "Id", "Payee": "Name"})
     BAC_data = BAC_data[BAC_data["Name"] != "BA ELECTRONIC PAYMENT"]
+    BAC_data = BAC_data[BAC_data["Name"] != "CASH REWARDS STATEMENT CREDIT"]
     BAC_data = BAC_data.drop("Address", axis=1)
     BAC_data["Date"] = pd.to_datetime(BAC_data["Date"])
     BAC_data["Source"] = "Bank of America"

@@ -4,11 +4,18 @@ from app.models import Ledger, TypeTable
 from config import Config
 import os
 from datetime import datetime
+import re
 
 import pandas as pd
 from app.dashapp.utils.dashboard_functions import *
 
 from sqlalchemy import select
+
+testdata= pd.read_csv('debugdata\Credit Card - 9129_01-01-2022_12-21-2022.csv')
+testdata= clean_import(testdata)
+
+# testdata['Name'] =testdata['Name'].apply(lambda x: re.sub(r"\s+", " ", x))
+# testdata['Id'] = testdata['Id'].apply(lambda x: re.split(r";", x)[0])
 
 indata = pd.read_csv('August2022_8641.csv')
 indata = clean_import(indata)
