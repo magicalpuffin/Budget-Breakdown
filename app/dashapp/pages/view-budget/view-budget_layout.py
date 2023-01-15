@@ -1,8 +1,14 @@
 from dash import html, dcc, dash_table
 from dash import register_page
 import dash_bootstrap_components as dbc
+import pandas as pd
+
+from app.models import Ledger, TypeTable
+import sqlalchemy as sa
 
 from utils.dashboard_functions import *
+
+from app import db
 
 # Creates a figure and displays in web app
 # Should switch to a database
@@ -15,17 +21,18 @@ register_page(
 
 page_id = id_factory('view-budget')
 
-# Consider adding filtering by date
-# Could also prototype the datetimegrouping callback thing, dcc.store with xbin change callback
+maxdate = db.session.execute(sa.select(sa.func.max(Ledger.date))).first()[0]
 
 layout = html.Div(
     [
-        html.H1('Budget Breakdown Figure', id= page_id('header-main')),
+        html.H1('View Budget', id= page_id('header-main')),
         dbc.Row([
             dbc.Label("Time Range", width= 1),
             dbc.Col(
                 dcc.DatePickerRange(
                     id= page_id('input-date-range'), 
+                    start_date= maxdate - pd.DateOffset(years= 1),
+                    end_date= maxdate,
                 ),
                 width= 2
             ),
@@ -43,9 +50,22 @@ layout = html.Div(
                     id= page_id('input-time-dropdown')
                 ),
                 width= 2
-            )
+            ),
+            dbc.Label("Category", width= 1),
+            dbc.Col(
+                dcc.Dropdown(
+                    value= 'Type',
+                    options= [
+                        'Type'
+                    ],
+                    id= page_id('input-category-dropdown')
+                ),
+                width= 2,
+            ),
         ]),
         dcc.Graph(id= page_id('figure-budget')),
+        html.H1("Selected Data"),
+        dbc.Button("Reset", id= page_id('button-reset'), class_name= 'mb-2'),
         dash_table.DataTable(
             id = page_id('table-budget'),
             columns = [
@@ -60,7 +80,7 @@ layout = html.Div(
             fixed_rows={'headers': True}
         ),
         dcc.Store(id= page_id('store-cledger'))
-    ]
+    ], className= 'mx-4',
 )
 
 

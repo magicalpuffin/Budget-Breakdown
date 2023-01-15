@@ -11,6 +11,8 @@ from app.dashapp.utils.dashboard_functions import *
 
 from sqlalchemy import select
 
+# This should probably be deleted
+
 testdata= pd.read_csv('debugdata\Credit Card - 9129_01-01-2022_12-21-2022.csv')
 testdata= clean_import(testdata)
 

@@ -15,7 +15,7 @@ page_id = id_factory('edit-type')
 
 layout = html.Div(
     [
-        html.H5("Types", id = page_id('header-main')),
+        html.H1("Edit Types", id = page_id('header-main')),
         dbc.Row([
             dbc.Col([
                 # For some reason, in order to copy paste into the table,
@@ -38,7 +38,7 @@ layout = html.Div(
             ], width= 6),
         ]),
         dcc.Store(id= page_id('store-types')),
-    ], style= {'padding': 10}
+    ], className= 'mx-4',
 )
 
 

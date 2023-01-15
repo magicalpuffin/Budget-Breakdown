@@ -49,5 +49,5 @@ layout = html.Div(
                 html.H2("", id= page_id('header-append-status')),
             ], width= 6),
         ]),
-    ]
+    ], className= 'mx-4',
 )

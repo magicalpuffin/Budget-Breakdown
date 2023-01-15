@@ -1,4 +1,5 @@
 import pandas as pd
+import calendar
 import re
 
 # Consider making the utils folder a module
@@ -95,3 +96,12 @@ def add_types(ledger_df, type_df):
     uncategorized_df = uncategorized_df[~uncategorized_df["Name"].duplicated()]
 
     return ledger_categorized_df, uncategorized_df
+
+def month_mid(input_date):
+    '''
+    For a given date time, find the middle of the month. Used to sync with histbar
+    '''
+
+    daysinmonth = calendar.monthrange(input_date.year, input_date.month)[1]
+
+    return int(daysinmonth/2 + 1)
