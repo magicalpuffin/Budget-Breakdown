@@ -12,7 +12,7 @@ from utils.dashboard_functions import *
 
 from app import db
 
-page_id = id_factory('view-budget')
+page_id = id_factory('2022-report')
 
 # Manualy set colors for consistency
 typecolor_dict = {
@@ -27,37 +27,8 @@ typecolor_dict = {
     'Restaurant' : '#6610F2',
     'Transportation' : '#009ad9',
     'Utilities' : '#026937',
+    'Rent' : '#FFC107',
 }
-
-@callback(
-    Output(page_id('store-cledger'), 'data'),
-    Input(page_id('header-main'), 'children'),
-    Input(page_id('input-date-range'), "start_date"),
-    Input(page_id('input-date-range'), "end_date"),
-)
-def updatestore(header_text, start_date, end_date):
-    qstmnt = sa.select(
-        Ledger.id, 
-        Ledger.date, 
-        Ledger.name, 
-        Ledger.amount, 
-        Ledger.source, 
-        TypeTable.type).join_from(
-            Ledger, 
-            TypeTable, 
-            Ledger.name == TypeTable.name)
-
-    cledger_dict = db.session.execute(qstmnt).all()
-    cldeger_df = pd.DataFrame.from_records(cledger_dict)
-    cldeger_df.columns =['id', 'date', 'name', 'amount', 'source', 'type']
-
-    cldeger_df = cldeger_df[
-        (cldeger_df['date'] >= pd.to_datetime(start_date, utc= True)) &
-        (cldeger_df['date'] <= (pd.to_datetime(end_date, utc= True)))
-    ]
-
-    return cldeger_df.to_dict('records')
-
 
 # Weird work around to load the figure everytime the link is opened
 # Maybe switching to an anctual database would help
@@ -155,26 +126,3 @@ def load_fig(cledger_dict, time_group, filter_category):
         )
     
     return fig
-
-@callback(
-    Output(page_id('table-budget'), 'data'),
-    Input(page_id('figure-budget'), 'clickData'),
-    Input(page_id('store-cledger'), 'data'),
-    Input(page_id('button-reset'), 'n_clicks'),
-)
-def display_click_data(clickData, cledger_dict, n_clicks):
-    # Checks for changes in data store
-    if cledger_dict:
-        cledger_df = pd.DataFrame.from_records(cledger_dict)
-        cledger_df["date"] = pd.to_datetime(cledger_df["date"])
-
-        # Updates when clicked
-        # If reset button is pressed, section is skipped, showing full table
-        if clickData and (page_id('button-reset') != ctx.triggered_id):
-            clickData = clickData['points'][0]['customdata']
-            cledger_df = cledger_df[cledger_df['id'].isin(clickData)]
-
-        cledger_df = cledger_df.to_dict('records')
-        
-        return cledger_df
-    return
