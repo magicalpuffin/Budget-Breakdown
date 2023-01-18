@@ -3,6 +3,7 @@ from app.models import Ledger, TypeTable
 
 import pandas as pd
 import datetime
+import plotly.graph_objects as go
 
 from sqlalchemy import select
 
@@ -38,21 +39,7 @@ cldeger_df['date'] = pd.to_datetime(cldeger_df['date'])
 cledgergrouped = cldeger_df.groupby(pd.Grouper(key= 'date', freq= '1M'))['id'].apply(lambda x: [x])
 temp = cledgergrouped.map(lambda x: x[0])
 
-cledgergrouped['2022-01-31'][0]
+# Testing grouping types
+typesum = -cldeger_df.groupby(pd.Grouper(key= 'type'))['amount'].sum()
 
-cldeger_df.set_index(['date']).groupby(pd.Grouper(key= 'id')).resample('1M').apply(lambda x:x)
-
-# messing with reindexing
-pd.date_range(start= cldeger_df['date'].min(), end= cldeger_df['date'].max(), freq= '1M')
-cldeger_df.set_index('date').reindex(pd.date_range(start= cldeger_df['date'].min(), end= cldeger_df['date'].max(), freq= '1M'))
-
-cldeger_df.set_index(['date']).asfreq('1M')
-cldeger_df.set_index(['date', 'id']).groupby(pd.Grouper(level=0, freq= '1M'))['amount'].sum()
-
-test_df = pd.DataFrame({
-    'date': pd.date_range(start= '2022-01-01', end= '2023-01-01', freq= '1M'), 
-    'amount': [-1800]*12, 
-    'type': ['Rent']*12,
-})
-
-pd.concat([cldeger_df, test_df])
+typesum = pd.concat([typesum[typesum >= 500], pd.Series({'Other': typesum[typesum < 500].sum()})])

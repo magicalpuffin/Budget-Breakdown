@@ -43,12 +43,12 @@ cledger_dict = db.session.execute(qstmnt).all()
 cldeger_df = pd.DataFrame.from_records(cledger_dict)
 cldeger_df.columns =['id', 'date', 'name', 'amount', 'source', 'type']
 
+# Manually concat of rent spending. Other fields left na.
 rent_df = pd.DataFrame({
     'date': pd.date_range(start= '2022-01-01', end= '2023-01-01', freq= '1M'), 
     'amount': [-1800]*12, 
     'type': ['Rent']*12,
 })
-
 cldeger_df = pd.concat([cldeger_df, rent_df])
 
 layout = html.Div(
@@ -83,6 +83,13 @@ layout = html.Div(
             ),
         ]),
         dcc.Graph(id= page_id('figure-budget')),
+        dbc.Row([
+            dbc.Col(
+                dcc.Graph(id= page_id('figure-pie')),
+                width= 6,
+            ),
+        ]),
+        # dcc.Graph(id= page_id('figure-bar')),
         dcc.Store(
             id= page_id('store-cledger'),
             data= cldeger_df.to_dict('records')

@@ -145,6 +145,9 @@ def load_fig(cledger_dict, time_group, filter_category):
             ), 
             # secondary_y= False
         )
+        fig.update_layout(
+            title = "<b>Total Spending Over Time</b>"
+        )
         fig.update_yaxes(
             title_text = "Cost ($)",
             rangemode = 'tozero',

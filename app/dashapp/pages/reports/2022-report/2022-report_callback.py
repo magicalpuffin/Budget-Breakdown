@@ -24,10 +24,11 @@ typecolor_dict = {
     'Healthcare' : '#006BA6',
     'Hobby' : '#1F3B4D',
     'Misc' : '#6610F2',
+    'Other' : '#6610F2',
     'Restaurant' : '#6610F2',
     'Transportation' : '#009ad9',
     'Utilities' : '#026937',
-    'Rent' : '#FFC107',
+    'Rent' : '#FDFD96',
 }
 
 # Weird work around to load the figure everytime the link is opened
@@ -76,7 +77,7 @@ def load_fig(cledger_dict, time_group, filter_category):
             ))
 
         fig.update_layout(
-            title= ("<b>Total Spending Over Time</b><br>" + 
+            title= ("<b>2022 Total Spending</b><br>" + 
                     "<i>Spending by Type</i>"),
             barmode= 'stack', 
             bargap = 0.1,
@@ -116,6 +117,9 @@ def load_fig(cledger_dict, time_group, filter_category):
             ), 
             # secondary_y= False
         )
+        fig.update_layout(
+            title = "<b>2022 Total Spending</b>"
+        )
         fig.update_yaxes(
             title_text = "Cost ($)",
             rangemode = 'tozero',
@@ -125,4 +129,35 @@ def load_fig(cledger_dict, time_group, filter_category):
             ticklabelmode = 'period'
         )
     
+    return fig
+
+@callback(
+    Output(page_id('figure-pie'), 'figure'),
+    Input(page_id('store-cledger'), 'data'),
+)
+def load_piefig(cledger_dict):
+    cledger_df = pd.DataFrame.from_records(cledger_dict)
+    cledger_df["date"] = pd.to_datetime(cledger_df["date"])
+
+    typecostsum = -cledger_df.groupby(pd.Grouper(key= 'type'))['amount'].sum()
+    typecostsum = pd.concat([typecostsum[typecostsum >= 500], pd.Series({'Other': typecostsum[typecostsum < 500].sum()})])
+
+    typecolors = [typecolor_dict[type_name] for type_name in typecostsum.index]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Pie(
+        labels= typecostsum.index,
+        values= typecostsum.values,
+        hole= 0.3,
+        textinfo= 'label+percent+value',
+        marker= {
+            'colors': typecolors,
+        },
+    ))
+    fig.update_layout(
+        title= "<b>2022 Spending Pie Chart</b>",
+        height= 600,
+    )
+
     return fig
