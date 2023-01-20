@@ -161,3 +161,37 @@ def load_piefig(cledger_dict):
     )
 
     return fig
+
+@callback(
+    Output(page_id('figure-bar'), 'figure'),
+    Input(page_id('store-cledger'), 'data'),
+)
+def load_barfig(cledger_dict):
+    cledger_df = pd.DataFrame.from_records(cledger_dict)
+    cledger_df["date"] = pd.to_datetime(cledger_df["date"])
+
+    typecostsum = -cledger_df.groupby(pd.Grouper(key= 'type'))['amount'].sum()
+    typecostprec = typecostsum/typecostsum.sum()*100
+
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x= typecostsum.values,
+        y= typecostsum.index,
+        customdata= typecostprec.values,
+        texttemplate= "$%{x:.2f} (%{customdata:.2f}%)",
+        orientation= 'h',
+    ))
+    fig.update_yaxes(
+        categoryorder = 'total ascending'
+    )
+    fig.update_xaxes(
+        title = "Cost ($)",
+    )
+    fig.update_layout(
+        title= "<b>2022 Spending Bar Chart</b>",
+        height= 600,
+    )
+
+    return fig

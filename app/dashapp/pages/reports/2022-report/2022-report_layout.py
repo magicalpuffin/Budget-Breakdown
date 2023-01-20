@@ -88,8 +88,11 @@ layout = html.Div(
                 dcc.Graph(id= page_id('figure-pie')),
                 width= 6,
             ),
+            dbc.Col(
+                dcc.Graph(id= page_id('figure-bar')),
+                width= 6,
+            ),
         ]),
-        # dcc.Graph(id= page_id('figure-bar')),
         dcc.Store(
             id= page_id('store-cledger'),
             data= cldeger_df.to_dict('records')
